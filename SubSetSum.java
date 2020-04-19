@@ -7,39 +7,66 @@ public class SubSetSum {
 	static int n = 1; // The n number user choose
 	static long nano_startTime;
 	static long nano_endTime;
+	static long nano_startTime2;
+	static long nano_endTime2;
+	
 	private static Scanner input;
 	
-	public static boolean subSetDP(int[] A, int sum) {
+	public static boolean subsetSumDP (int[] testSet, int sum) {
 		
-		boolean[][] matrixTable = new boolean[A.length + 1][sum + 1];	
-		
-		// if sum is not zero and subset is 0, we can't make it 
-		for (int i=1; i<=sum; i++) {
+		boolean[][] matrixTable = new boolean[testSet.length + 1][sum + 1];	
+		 
+		//First set first row to all false
+		for (int i=1; i<=sum; i++) 
+		{
 			matrixTable[0][i]=false;
 		}
-		// if sum is 0 the we can make the empty subset to make sum 0
-		for(int i=0;i<=A.length;i++){
+
+		//Second set first column all true
+		for(int i=0;i<=testSet.length;i++)
+		{
 			matrixTable[i][0]=true;
 		}
-		
-		
-		
-		for(int i=1; i<=A.length; i++) {
-			
+				
+		//Use dynamic programming approach to look for the match subset
+		for(int i=1; i<=testSet.length; i++) 
+		{			
 			for(int j=1; j<=sum; j++) {	
 				
-				//first copy the data from the top
 				matrixTable[i][j] = matrixTable[i-1][j];				
-				//If solution[i][j]==false check if can be made
-				if(matrixTable[i][j]==false && j>=A[i-1])
+				
+				if(matrixTable[i][j]==false && j>=testSet[i-1])
 				{
-					matrixTable[i][j] = matrixTable[i][j] || matrixTable[i-1][j-A[i-1]];		
+					matrixTable[i][j] = matrixTable[i][j] || matrixTable[i-1][j-testSet[i-1]];		
 				}
 			}
 		}		
-		return matrixTable[A.length][sum];
+		
+		return matrixTable[testSet.length][sum];
 	}
 	
+	static boolean subsetSumRecursive(int testSet[],  int n, int sum) 
+	{ 
+
+		if (sum == 0) 
+		{
+			return true; 
+		}
+
+		if (n == 0 && sum != 0) 
+		{
+			return false; 
+		}
+		
+		if (testSet[n-1] > sum) 
+		{
+			return subsetSumRecursive(testSet, n-1, sum); 
+		}
+		return subsetSumRecursive(testSet, n-1, sum) ||  subsetSumRecursive(testSet, n-1, sum-testSet[n-1]); 
+
+	} 
+	
+	//This method will create random array
 	public static void randomArray(int n) 
 	{
 		num = new int[n];
@@ -53,14 +80,9 @@ public class SubSetSum {
 		
 	}
 	
-
 	public static void main(String[] args) {
 		
-		//int[] A = { 1, 2, 4, 5, 9};
-		
-		//System.out.println("\nFrom DP: " + subSetDP(A, 15) );
-		
-        System.out.print("Enter 0 to stop program " +"\n");
+        System.out.print("Enter 1 to use  " +"\n");
 		
 		while(n != 0)
 		{		
@@ -71,30 +93,38 @@ public class SubSetSum {
 			randomArray(n); //Call randomArray to create random size array
 			
 			nano_startTime = System.nanoTime(); // By calling nano_startTime it will count the execution time
-	        boolean result = subSetDP(num, 15);         
+	        boolean result = subsetSumDP(num, 18);         
 	        nano_endTime = System.nanoTime();  // By calling nano_endTime it will stop counting the execution time
+	        
+	        nano_startTime2 = System.nanoTime(); // By calling nano_startTime it will count the execution time
+	        boolean result2 = subsetSumRecursive(num, num.length, 18);         
+	        nano_endTime2 = System.nanoTime();  // By calling nano_endTime it will stop counting the execution time
 			
 	        System.out.println(" ");
 	        
-			if ( result == true )
+			if ( result == true && result2 == true )
 			{			
-				System.out.println("Found a subset with given sum");
-				System.out.println("\nTime taken by DP subset sum: " + (nano_endTime - nano_startTime)+ " ns"); //Display execution time
+				System.out.println("************************************************ ");
+				System.out.println("Found a subset with given sum                  ");
+				System.out.println("Time taken by DP subset sum: " + (nano_endTime - nano_startTime)+ " ns"); //Display execution time
+				System.out.println("Time taken by recursive subset sum: " + (nano_endTime2 - nano_startTime2)+ " ns"); //Display execution time
+				System.out.println("************************************************ ");
 			}
 			
-			else
+			else if( result == false && result2 == false )
 			{
-				System.out.println("No subset found with given sum");
-				System.out.println("\nTime taken by DP subset sum: " + (nano_endTime - nano_startTime)+ " ns"); //Display execution time
+				System.out.println("************************************************ ");
+				System.out.println("No subset found with given sum                * ");
+				System.out.println("Time taken by DP subset sum: " + (nano_endTime - nano_startTime)+ " ns"); //Display execution time
+				System.out.println("Time taken by recursive subset sum: " + (nano_endTime2 - nano_startTime2)+ " ns"); //Display execution time
+				System.out.println("************************************************ ");
+			}
+			else 
+			{
+				System.out.print("Error one of the program has different result");
 			}
 			
-			System.out.println("****************************************** ");
 		}  
-		
-		System.out.print("merge sort program end\n");
-		
-		
-		
 	}
 
 }
